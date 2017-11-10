@@ -12,18 +12,19 @@
 using namespace std;
 using Word = int;
 using Adress = unsigned int;
-using BIN = string;
+using Tag = string;
+
 
 #pragma once
 class Cache
 {
 private:
-	vector<pair<BIN, vector<pair<BIN, Word>>>> cache;
+	vector<pair<Tag, vector<pair<Tag, Word>>>> cache;
 public:
 	Cache();
 	~Cache();
 
-	Word consultCache(Memoria *memoria, Adress *pc);
-	Word updateCache(Memoria *memoria, Adress *pc);
+	Word consultCache(Memoria *memoria, Adress pc);
+	Word updateCache(Memoria *memoria, Adress pc);
 };
 

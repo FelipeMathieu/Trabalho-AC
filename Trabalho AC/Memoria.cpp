@@ -52,7 +52,7 @@ Adress Memoria::getAdressOfInstruction(Word value, Adress valueOfProgramCounter)
 	return value;
 }
 
-vector<pair<BIN, Word>> Memoria::returnToCache(BIN t, Adress pc)
+vector<pair<Tag, Word>> Memoria::returnToCache(Tag t, Adress pc)
 {
 	string tMem = "";
 	string bin = "";
@@ -60,7 +60,7 @@ vector<pair<BIN, Word>> Memoria::returnToCache(BIN t, Adress pc)
 
 	bitset<24> binMem;
 
-	vector<pair<BIN, Word>> c(64);
+	vector<pair<Tag, Word>> c(64);
 	int j = 0;
 
 	for (int i = pc; i < (int)this->memoria.size(); i++)
@@ -72,7 +72,7 @@ vector<pair<BIN, Word>> Memoria::returnToCache(BIN t, Adress pc)
 
 		if (t.compare(tMem) == 0)
 		{
-			c.at(j) = *new pair<BIN, Word>(wMem, this->memoria.at(i));
+			c.at(j) = *new pair<Tag, Word>(wMem, this->memoria.at(i));
 			j++;
 		}
 		if (j == 64)

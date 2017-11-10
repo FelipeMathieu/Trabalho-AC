@@ -12,7 +12,7 @@ using namespace std;
 
 using Word = int;
 using Adress = unsigned int;
-using BIN = string;
+using Tag = string;
 
 class Memoria
 {
@@ -31,6 +31,6 @@ public:
 	Word getIntructions(Adress programCounter);
 	bool alocaInstrucao(Adress adress, Word value);
 	Adress getAdressOfInstruction(Word value, Adress valueOfProgramCounter);
-	vector<pair<BIN, Word>> returnToCache(BIN t, Adress pc);
+	vector<pair<Tag, Word>> returnToCache(Tag t, Adress pc);
 };
 

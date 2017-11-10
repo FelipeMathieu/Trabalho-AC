@@ -21,7 +21,7 @@ void CPU::execute(Memoria *memoria, Registradores *reg, Adress inicio, int instr
 	while (this->programCounter < instrucoes)
 	{
 		//s = memoria->getIntructions(this->programCounter);
-		s = cache->consultCache(memoria, &this->programCounter);
+		s = cache->consultCache(memoria, this->programCounter);
 		instToDo = decode.getInstruction(s);
 
 		//NOP
@@ -154,10 +154,10 @@ void CPU::mov_rr(Memoria *memoria, Registradores *reg, Cache *cache)
 {
 	Adress registrador = 0, registrador1 = 0;
 
-	registrador = cache->consultCache(memoria, &this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
-	registrador1 = cache->consultCache(memoria, &this->programCounter);
+	registrador1 = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
 	reg->setReg(registrador, reg->getValueOfReg(registrador1));
@@ -169,15 +169,15 @@ void CPU::mov_rm(Memoria *memoria, Registradores *reg, int instructions, Cache *
 	Adress registrador = 0;
 	Adress mem = 0;
 
-	registrador = cache->consultCache(memoria, &this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
-	mem = cache->consultCache(memoria, &this->programCounter);
+	mem = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
 	if (mem > instructions)
 	{
-		reg->setReg(registrador, cache->updateCache(memoria, &mem));
+		reg->setReg(registrador, cache->updateCache(memoria, mem));
 	}
 	else
 	{
@@ -192,10 +192,10 @@ void CPU::mov_mr(Memoria *memoria, Registradores *reg, int instructions, Cache *
 	Adress registrador = 0;
 	Adress mem = 0;
 
-	mem = cache->consultCache(memoria, &this->programCounter);
+	mem = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
-	registrador = cache->consultCache(memoria, &this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
 	if (mem > instructions)
@@ -218,10 +218,10 @@ void CPU::mov_ri(Memoria *memoria, Registradores *reg, Cache *cache)
 {
 	Adress registrador = 0, imediato = 0;
 
-	registrador = cache->consultCache(memoria, &this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
-	imediato = cache->consultCache(memoria, &this->programCounter);
+	imediato = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
 	reg->setReg(registrador, imediato);
@@ -233,10 +233,10 @@ void CPU::mov_mi(Memoria *memoria, int instrucitons, Cache *cache)
 	Word imediato = 0;
 	Adress mem = 0;
 
-	mem = cache->consultCache(memoria, &this->programCounter);
+	mem = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
-	imediato = cache->consultCache(memoria, &this->programCounter);
+	imediato = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
 	if (mem > instrucitons)
@@ -260,10 +260,10 @@ void CPU::add(Memoria *memoria, Registradores *reg, Cache *cache)
 	Adress registrador = 0, registrador1 = 0;
 	Word value = 0;
 
-	registrador = cache->consultCache(memoria, &this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
-	registrador1 = cache->consultCache(memoria, &this->programCounter);
+	registrador1 = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
 	value = reg->getValueOfReg(registrador) + reg->getValueOfReg(registrador1);
@@ -277,10 +277,10 @@ void CPU::sub(Memoria *memoria, Registradores *reg, Cache *cache)
 	Adress registrador = 0, registrador1 = 0;
 	Word value = 0;
 
-	registrador = cache->consultCache(memoria, &this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
-	registrador1 = cache->consultCache(memoria, &this->programCounter);
+	registrador1 = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
 	value = reg->getValueOfReg(registrador) - reg->getValueOfReg(registrador1);
@@ -293,10 +293,10 @@ void CPU::cmp(Memoria *memoria, Registradores *reg, Cache *cache)
 {
 	Adress registrador = 0, registrador1 = 0;
 
-	registrador = cache->consultCache(memoria, &this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
-	registrador1 = cache->consultCache(memoria, &this->programCounter);
+	registrador1 = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
 	this->flag = reg->getValueOfReg(registrador) - reg->getValueOfReg(registrador1);
@@ -307,7 +307,7 @@ void CPU::jmp(Memoria *memoria, Cache *cache)
 {
 	Adress mem = 0;
 
-	mem = cache->consultCache(memoria, &this->programCounter);
+	mem = cache->consultCache(memoria, this->programCounter);
 	this->programCounter = memoria->getAdressOfInstruction(mem, this->programCounter);
 }
 
@@ -318,7 +318,7 @@ void CPU::jz(Memoria *memoria, Cache *cache)
 	{
 		Adress mem = 0;
 
-		mem = cache->consultCache(memoria, &this->programCounter);
+		mem = cache->consultCache(memoria, this->programCounter);
 		this->programCounter = memoria->getAdressOfInstruction(mem, this->programCounter);
 	}
 	else
@@ -334,7 +334,7 @@ void CPU::jg(Memoria *memoria, Cache *cache)
 	{
 		Adress mem = 0;
 
-		mem = cache->consultCache(memoria, &this->programCounter);
+		mem = cache->consultCache(memoria, this->programCounter);
 		this->programCounter = memoria->getAdressOfInstruction(mem, this->programCounter);
 	}
 	else
@@ -350,7 +350,7 @@ void CPU::jl(Memoria *memoria, Cache *cache)
 	{
 		Adress mem = 0;
 
-		mem = cache->consultCache(memoria, &this->programCounter);
+		mem = cache->consultCache(memoria, this->programCounter);
 		this->programCounter = memoria->getAdressOfInstruction(mem, this->programCounter);
 	}
 	else
@@ -366,7 +366,7 @@ void CPU::out(Memoria *memoria, Registradores *reg, Cache *cache)
 	string value = "";
 	string name = "";
 
-	registrador = cache->consultCache(memoria, &this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
 	value = to_string(reg->getValueOfReg(registrador));
@@ -381,7 +381,7 @@ void CPU::inc(Memoria *memoria, Registradores *reg, Cache *cache)
 	Adress registrador = 0;
 	Word value = 0;
 
-	registrador = cache->consultCache(memoria, &this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
 	value = reg->getValueOfReg(registrador) + 1;
@@ -395,7 +395,7 @@ void CPU::dec(Memoria *memoria, Registradores *reg, Cache *cache)
 	Adress registrador = 0;
 	Word value = 0;
 
-	registrador = cache->consultCache(memoria, &this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
 	value = reg->getValueOfReg(registrador) - 1;
@@ -409,10 +409,10 @@ void CPU::mul(Memoria *memoria, Registradores *reg, Cache *cache)
 	Adress registrador = 0, registrador1 = 0;
 	Word value = 0;
 
-	registrador = cache->consultCache(memoria, &this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
-	registrador1 = cache->consultCache(memoria, &this->programCounter);
+	registrador1 = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
 	value = reg->getValueOfReg(registrador) * reg->getValueOfReg(registrador1);
@@ -426,10 +426,10 @@ void CPU::div(Memoria *memoria, Registradores *reg, Cache *cache)
 	Adress registrador = 0, registrador1 = 0;
 	Word value = 0, rest = 0;
 
-	registrador = cache->consultCache(memoria, &this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
-	registrador1 = cache->consultCache(memoria, &this->programCounter);
+	registrador1 = cache->consultCache(memoria, this->programCounter);
 	this->programCounter++;
 
 	value = reg->getValueOfReg(registrador) / reg->getValueOfReg(registrador1);
