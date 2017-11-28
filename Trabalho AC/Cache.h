@@ -8,6 +8,7 @@
 #include <limits>
 #include <string>
 #include <bitset>
+#include <fstream>
 
 using namespace std;
 using Word = int;
@@ -24,7 +25,7 @@ public:
 	Cache();
 	~Cache();
 
-	Word consultCache(Memoria *memoria, Adress pc);
-	Word updateCache(Memoria *memoria, Adress pc);
+	Word consultCache(Memoria *memoria, Adress pc, ofstream *file);
+	Word updateCache(Memoria *memoria, Adress pc, ofstream *file);
 };
 

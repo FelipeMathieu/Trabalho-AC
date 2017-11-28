@@ -45,8 +45,8 @@ def codificador(file, dicionario, registradores):
                     else:
                         auxValueOfLabel = getValueOfLabel(label, c)
                         if auxValueOfLabel == 0:
-                            label.append((c, linha + 5000))
-                            comandos.append(linha + 5000)
+                            label.append((c, linha + 50000))
+                            comandos.append(linha + 50000)
                         else:
                             comandos.append(auxValueOfLabel)
             else:

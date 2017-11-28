@@ -15,13 +15,13 @@ if __name__ == "__main__":
     print(d)
     print(r)
 
-    with open("Assembly.txt") as assemblyFlie:
+    with open("Assembly3.txt") as assemblyFlie:
         aux = assemblyFlie.readlines()
     c = codificador(aux, d, r)
 
     print(c)
 
-    fileObject = open("Codificacao.txt", "w")
+    fileObject = open("Codificacao3.txt", "w")
     i = 0
     for v in c:
         string = str(v)

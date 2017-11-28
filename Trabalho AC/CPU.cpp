@@ -18,10 +18,22 @@ void CPU::execute(Memoria *memoria, Registradores *reg, Adress inicio, int instr
 	Word s = 0;
 	this->programCounter = inicio;
 	string instToDo = "";
-	while (this->programCounter < instrucoes)
+	string fileName = "Output" + to_string(this->CPUnumber) + ".txt";
+
+	this->file.open(fileName);
+
+	if (!file.is_open())
+	{
+		cout << "ERRO AO ABRIR ARQUIVO DE SAIDA: " << to_string(this->CPUnumber) << endl;
+		return;
+	}
+
+	Adress e = inicio + instrucoes;
+
+	while (true)
 	{
 		//s = memoria->getIntructions(this->programCounter);
-		s = cache->consultCache(memoria, this->programCounter);
+		s = cache->consultCache(memoria, this->programCounter, &this->file);
 		instToDo = decode.getInstruction(s);
 
 		//NOP
@@ -35,7 +47,7 @@ void CPU::execute(Memoria *memoria, Registradores *reg, Adress inicio, int instr
 		{
 			//HALT
 			this->programCounter++;
-			cout << "CPU: " << this->CPUnumber << " processes stopped by HALT" << endl;
+			this->file << "CPU: " << this->CPUnumber << " processes stopped by HALT" << endl;
 			break;
 		}
 		//MOV_RR
@@ -48,13 +60,13 @@ void CPU::execute(Memoria *memoria, Registradores *reg, Adress inicio, int instr
 		else if (instToDo == "MOV_RM")
 		{
 			this->programCounter++;
-			this->mov_rm(memoria, reg, instrucoes, cache);
+			this->mov_rm(memoria, reg, e, cache);
 		}
 		//MOV_MR
 		else if (instToDo == "MOV_MR")
 		{
 			this->programCounter++;
-			this->mov_mr(memoria, reg, instrucoes, cache);
+			this->mov_mr(memoria, reg, e, cache);
 		}
 		//MOV_RI
 		else if (instToDo == "MOV_RI")
@@ -66,7 +78,7 @@ void CPU::execute(Memoria *memoria, Registradores *reg, Adress inicio, int instr
 		else if (instToDo == "MOV_MI")
 		{
 			this->programCounter++;
-			this->mov_mi(memoria, instrucoes, cache);
+			this->mov_mi(memoria, e, cache);
 		}
 		//ADD
 		else if (instToDo == "ADD")
@@ -90,25 +102,25 @@ void CPU::execute(Memoria *memoria, Registradores *reg, Adress inicio, int instr
 		else if (instToDo == "JMP")
 		{
 			this->programCounter++;
-			this->jmp(memoria, cache);
+			this->jmp(memoria, cache, inicio);
 		}
 		//JZ
 		else if (instToDo == "JZ")
 		{
 			this->programCounter++;
-			this->jz(memoria, cache);
+			this->jz(memoria, cache, inicio);
 		}
 		//JG
 		else if (instToDo == "JG")
 		{
 			this->programCounter++;
-			this->jg(memoria, cache);
+			this->jg(memoria, cache, inicio);
 		}
 		//JL
 		else if (instToDo == "JL")
 		{
 			this->programCounter++;
-			this->jl(memoria, cache);
+			this->jl(memoria, cache, inicio);
 		}
 		//OUT
 		else if (instToDo == "OUT")
@@ -147,6 +159,8 @@ void CPU::execute(Memoria *memoria, Registradores *reg, Adress inicio, int instr
 	}
 
 	cout << "CPU: " << this->CPUnumber << " finished!" << endl;
+	this->file << "CPU: " << this->CPUnumber << " finished!" << endl;
+	file.close();
 }
 
 //move Rx <- Ry
@@ -154,10 +168,10 @@ void CPU::mov_rr(Memoria *memoria, Registradores *reg, Cache *cache)
 {
 	Adress registrador = 0, registrador1 = 0;
 
-	registrador = cache->consultCache(memoria, this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
-	registrador1 = cache->consultCache(memoria, this->programCounter);
+	registrador1 = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
 	reg->setReg(registrador, reg->getValueOfReg(registrador1));
@@ -169,19 +183,19 @@ void CPU::mov_rm(Memoria *memoria, Registradores *reg, int instructions, Cache *
 	Adress registrador = 0;
 	Adress mem = 0;
 
-	registrador = cache->consultCache(memoria, this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
-	mem = cache->consultCache(memoria, this->programCounter);
+	mem = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
 	if (mem > instructions)
 	{
-		reg->setReg(registrador, cache->updateCache(memoria, mem));
+		reg->setReg(registrador, cache->updateCache(memoria, mem, &this->file));
 	}
 	else
 	{
-		cout << "ERRO AO ALOCAR MEMORIA" << endl;
+		cout << "ERRO AO ALOCAR MEMORIA" << endl << to_string(this->CPUnumber) << endl;
 		cout << "MEMORIA INACESSIVEL" << endl;
 	}
 }
@@ -192,23 +206,23 @@ void CPU::mov_mr(Memoria *memoria, Registradores *reg, int instructions, Cache *
 	Adress registrador = 0;
 	Adress mem = 0;
 
-	mem = cache->consultCache(memoria, this->programCounter);
+	mem = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
-	registrador = cache->consultCache(memoria, this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
 	if (mem > instructions)
 	{
 		if (!memoria->alocaInstrucao(mem, reg->getValueOfReg(registrador)))
 		{
-			cout << "ERRO AO ALOCAR VALOR DE REGISTRADOR NA MEMORIA!!!" << endl;
+			cout << "ERRO AO ALOCAR VALOR DE REGISTRADOR NA MEMORIA!!!" << endl << to_string(this->CPUnumber) << endl;
 			cout << "MOV_MR" << endl;
 		}
 	}
 	else
 	{
-		cout << "ERRO AO ALOCAR MEMORIA" << endl;
+		cout << "ERRO AO ALOCAR MEMORIA" << endl << to_string(this->CPUnumber) << endl;
 		cout << "MEMORIA INACESSIVEL" << endl;
 	}
 }
@@ -218,10 +232,10 @@ void CPU::mov_ri(Memoria *memoria, Registradores *reg, Cache *cache)
 {
 	Adress registrador = 0, imediato = 0;
 
-	registrador = cache->consultCache(memoria, this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
-	imediato = cache->consultCache(memoria, this->programCounter);
+	imediato = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
 	reg->setReg(registrador, imediato);
@@ -233,23 +247,23 @@ void CPU::mov_mi(Memoria *memoria, int instrucitons, Cache *cache)
 	Word imediato = 0;
 	Adress mem = 0;
 
-	mem = cache->consultCache(memoria, this->programCounter);
+	mem = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
-	imediato = cache->consultCache(memoria, this->programCounter);
+	imediato = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
 	if (mem > instrucitons)
 	{
 		if (!memoria->alocaInstrucao(mem, imediato))
 		{
-			cout << "ERRO AO ALOCAR VALOR DE REGISTRADOR NA MEMORIA!!!" << endl;
+			cout << "ERRO AO ALOCAR VALOR DE REGISTRADOR NA MEMORIA!!!" << endl << to_string(this->CPUnumber) << endl;
 			cout << "MOV_MR" << endl;
 		}
 	}
 	else
 	{
-		cout << "ERRO AO ALOCAR MEMORIA" << endl;
+		cout << "ERRO AO ALOCAR MEMORIA" << endl << to_string(this->CPUnumber) << endl;
 		cout << "MEMORIA INACESSIVEL" << endl;
 	}
 }
@@ -260,10 +274,10 @@ void CPU::add(Memoria *memoria, Registradores *reg, Cache *cache)
 	Adress registrador = 0, registrador1 = 0;
 	Word value = 0;
 
-	registrador = cache->consultCache(memoria, this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
-	registrador1 = cache->consultCache(memoria, this->programCounter);
+	registrador1 = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
 	value = reg->getValueOfReg(registrador) + reg->getValueOfReg(registrador1);
@@ -277,10 +291,10 @@ void CPU::sub(Memoria *memoria, Registradores *reg, Cache *cache)
 	Adress registrador = 0, registrador1 = 0;
 	Word value = 0;
 
-	registrador = cache->consultCache(memoria, this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
-	registrador1 = cache->consultCache(memoria, this->programCounter);
+	registrador1 = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
 	value = reg->getValueOfReg(registrador) - reg->getValueOfReg(registrador1);
@@ -293,33 +307,33 @@ void CPU::cmp(Memoria *memoria, Registradores *reg, Cache *cache)
 {
 	Adress registrador = 0, registrador1 = 0;
 
-	registrador = cache->consultCache(memoria, this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
-	registrador1 = cache->consultCache(memoria, this->programCounter);
+	registrador1 = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
 	this->flag = reg->getValueOfReg(registrador) - reg->getValueOfReg(registrador1);
 }
 
 //I = absolute address
-void CPU::jmp(Memoria *memoria, Cache *cache)
+void CPU::jmp(Memoria *memoria, Cache *cache, Adress inicio)
 {
 	Adress mem = 0;
 
-	mem = cache->consultCache(memoria, this->programCounter);
-	this->programCounter = memoria->getAdressOfInstruction(mem, this->programCounter);
+	mem = cache->consultCache(memoria, this->programCounter, &this->file);
+	this->programCounter = memoria->getAdressOfInstruction(mem, this->programCounter, inicio);
 }
 
 //I = relative jump if FL == 0
-void CPU::jz(Memoria *memoria, Cache *cache)
+void CPU::jz(Memoria *memoria, Cache *cache, Adress inicio)
 {
 	if (this->flag == 0)
 	{
 		Adress mem = 0;
 
-		mem = cache->consultCache(memoria, this->programCounter);
-		this->programCounter = memoria->getAdressOfInstruction(mem, this->programCounter);
+		mem = cache->consultCache(memoria, this->programCounter, &this->file);
+		this->programCounter = memoria->getAdressOfInstruction(mem, this->programCounter, inicio);
 	}
 	else
 	{
@@ -328,14 +342,14 @@ void CPU::jz(Memoria *memoria, Cache *cache)
 }
 
 //I = relative jump if FL > 0
-void CPU::jg(Memoria *memoria, Cache *cache)
+void CPU::jg(Memoria *memoria, Cache *cache, Adress inicio)
 {
 	if (this->flag > 0)
 	{
 		Adress mem = 0;
 
-		mem = cache->consultCache(memoria, this->programCounter);
-		this->programCounter = memoria->getAdressOfInstruction(mem, this->programCounter);
+		mem = cache->consultCache(memoria, this->programCounter, &this->file);
+		this->programCounter = memoria->getAdressOfInstruction(mem, this->programCounter, inicio);
 	}
 	else
 	{
@@ -344,14 +358,14 @@ void CPU::jg(Memoria *memoria, Cache *cache)
 }
 
 //I = relative jump if FL < 0
-void CPU::jl(Memoria *memoria, Cache *cache)
+void CPU::jl(Memoria *memoria, Cache *cache, Adress inicio)
 {
 	if (this->flag < 0)
 	{
 		Adress mem = 0;
 
-		mem = cache->consultCache(memoria, this->programCounter);
-		this->programCounter = memoria->getAdressOfInstruction(mem, this->programCounter);
+		mem = cache->consultCache(memoria, this->programCounter, &this->file);
+		this->programCounter = memoria->getAdressOfInstruction(mem, this->programCounter, inicio);
 	}
 	else
 	{
@@ -366,13 +380,13 @@ void CPU::out(Memoria *memoria, Registradores *reg, Cache *cache)
 	string value = "";
 	string name = "";
 
-	registrador = cache->consultCache(memoria, this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
 	value = to_string(reg->getValueOfReg(registrador));
 	name = reg->getNameOfReg(registrador);
 
-	cout << name << ": " << value << endl;
+	this->file << name << ": " << value << endl;
 }
 
 //Rx <- Rx + 1
@@ -381,7 +395,7 @@ void CPU::inc(Memoria *memoria, Registradores *reg, Cache *cache)
 	Adress registrador = 0;
 	Word value = 0;
 
-	registrador = cache->consultCache(memoria, this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
 	value = reg->getValueOfReg(registrador) + 1;
@@ -395,7 +409,7 @@ void CPU::dec(Memoria *memoria, Registradores *reg, Cache *cache)
 	Adress registrador = 0;
 	Word value = 0;
 
-	registrador = cache->consultCache(memoria, this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
 	value = reg->getValueOfReg(registrador) - 1;
@@ -409,10 +423,10 @@ void CPU::mul(Memoria *memoria, Registradores *reg, Cache *cache)
 	Adress registrador = 0, registrador1 = 0;
 	Word value = 0;
 
-	registrador = cache->consultCache(memoria, this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
-	registrador1 = cache->consultCache(memoria, this->programCounter);
+	registrador1 = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
 	value = reg->getValueOfReg(registrador) * reg->getValueOfReg(registrador1);
@@ -426,10 +440,10 @@ void CPU::div(Memoria *memoria, Registradores *reg, Cache *cache)
 	Adress registrador = 0, registrador1 = 0;
 	Word value = 0, rest = 0;
 
-	registrador = cache->consultCache(memoria, this->programCounter);
+	registrador = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
-	registrador1 = cache->consultCache(memoria, this->programCounter);
+	registrador1 = cache->consultCache(memoria, this->programCounter, &this->file);
 	this->programCounter++;
 
 	value = reg->getValueOfReg(registrador) / reg->getValueOfReg(registrador1);

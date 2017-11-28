@@ -39,9 +39,9 @@ bool Memoria::alocaInstrucao(Adress adress, Word value)
 	return false;
 }
 
-Adress Memoria::getAdressOfInstruction(Word value, Adress valueOfProgramCounter)
+Adress Memoria::getAdressOfInstruction(Word value, Adress valueOfProgramCounter, Adress inicio)
 {
-	for (int i = 0; i < this->memoria.size(); i++)
+	for (int i = inicio; i < this->memoria.size(); i++)
 	{
 		if (value == this->memoria.at(i) && i != valueOfProgramCounter)
 		{

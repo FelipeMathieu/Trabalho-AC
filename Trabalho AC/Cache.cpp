@@ -14,7 +14,7 @@ Cache::~Cache()
 {
 }
 
-Word Cache::consultCache(Memoria *memoria, Adress pc)
+Word Cache::consultCache(Memoria *memoria, Adress pc, ofstream *file)
 {
 	bitset<24> b = pc;
 	string bin = b.to_string();
@@ -31,7 +31,7 @@ Word Cache::consultCache(Memoria *memoria, Adress pc)
 
 	if (this->cache.at(linhaR).first == "")
 	{
-		cout << "Cache miss" << endl;
+		*file << "Cache miss" << endl;
 		vector<pair<Tag, Word>> c;
 		c = memoria->returnToCache(t, pc);
 		this->cache.at(linhaR).first = t;
@@ -48,7 +48,7 @@ Word Cache::consultCache(Memoria *memoria, Adress pc)
 		Adress tag = std::stoi(this->cache.at(linhaR).first, nullptr, 2);
 		if (stoi(t, nullptr, 2) == tag)
 		{
-			cout << "Cache hit" << endl;
+			*file << "Cache hit" << endl;
 			auto values = find_if(this->cache.at(linhaR).second.begin(), this->cache.at(linhaR).second.end(),
 				[&w](const pair<Tag, Word>&p) { return p.first == w; });
 
@@ -60,7 +60,7 @@ Word Cache::consultCache(Memoria *memoria, Adress pc)
 	return 0;
 }
 
-Word Cache::updateCache(Memoria *memoria, Adress pc)
+Word Cache::updateCache(Memoria *memoria, Adress pc, ofstream *file)
 {
 	bitset<24> b = pc;
 	string bin = b.to_string();
@@ -77,14 +77,14 @@ Word Cache::updateCache(Memoria *memoria, Adress pc)
 
 	if (this->cache.at(linhaR).first == "")
 	{
-		return this->consultCache(memoria, pc);
+		return this->consultCache(memoria, pc, file);
 	}
 	else
 	{
 		Adress tag = std::stoi(this->cache.at(linhaR).first, nullptr, 2);
 		if (stoi(t, nullptr, 2) == tag)
 		{
-			cout << "Cache hit" << endl;
+			*file << "Cache hit" << endl;
 			for (int i = 0; i < 64; i++)
 			{
 				if (this->cache.at(linhaR).second.at(i).first == w)

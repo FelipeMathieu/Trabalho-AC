@@ -15,11 +15,8 @@ using Word = int;
 using Adress = unsigned int;
 
 Memoria memoria;
-Registradores reg;
 DECODE decode;
-Cache cache = *new Cache();
-vector<CPU> cores(4);
-
+vector<CPU> cores;
 
 int loader(string nomeArquivo, Adress adress)
 {
@@ -41,27 +38,30 @@ int loader(string nomeArquivo, Adress adress)
 	return (int)comandos.size();
 }
 
-void startCPU(CPU *cpu, Adress number, int numberOfInstructions)
+void startCPU(CPU *cpu, Registradores *reg, Adress pc, int numberOfInstructions, Cache *cache)
 {
-	cpu->execute(&memoria, &reg, number, numberOfInstructions, decode, &cache);
+	cpu->execute(&memoria, reg, pc, numberOfInstructions, decode, cache);
 }
+
 
 int main()
 {
-	vector<thread> threads;
+	vector<thread*> threads;
+	vector<int> numberOfInstructions;
 
-	int numberOfInstructions = 0;
-	numberOfInstructions = loader("Assembler/Codificacao.txt", 0);
+	numberOfInstructions.push_back(loader("Assembler/Codificacao.txt", 0));
+	numberOfInstructions.push_back(loader("Assembler/Codificacao2.txt", 150));
+	numberOfInstructions.push_back(loader("Assembler/Codificacao3.txt", 666));
+	numberOfInstructions.push_back(loader("Assembler/Codificacao4.txt", 420));
 
-	for (int i = 0; i < 1; i++)
+	threads.push_back(new thread(startCPU, new CPU(0), new Registradores(), 0, numberOfInstructions.at(0), new Cache()));
+	threads.push_back(new thread(startCPU, new CPU(1), new Registradores(), 150, numberOfInstructions.at(1), new Cache()));
+	threads.push_back(new thread(startCPU, new CPU(2), new Registradores(), 666, numberOfInstructions.at(2), new Cache()));
+	threads.push_back(new thread(startCPU, new CPU(3), new Registradores(), 420, numberOfInstructions.at(3), new Cache()));
+
+	for (size_t i = 0; i < threads.size(); i++)
 	{
-		cores.at(i) = *new CPU(i);
-		threads.push_back(thread(startCPU, &cores.at(i), i, numberOfInstructions));
-	}
-
-	for (int i = 0; i < threads.size(); i++)
-	{
-		threads.at(i).join();
+		threads.at(i)->join();
 	}
 
 	system("pause");

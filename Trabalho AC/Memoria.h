@@ -30,7 +30,7 @@ public:
 	void alocaComandos(Adress inicio, vector<int> comandos);
 	Word getIntructions(Adress programCounter);
 	bool alocaInstrucao(Adress adress, Word value);
-	Adress getAdressOfInstruction(Word value, Adress valueOfProgramCounter);
+	Adress getAdressOfInstruction(Word value, Adress valueOfProgramCounter, Adress inicio);
 	vector<pair<Tag, Word>> returnToCache(Tag t, Adress pc);
 };
 
